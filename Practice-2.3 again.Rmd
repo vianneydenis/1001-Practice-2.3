@@ -1,0 +1,73 @@
+---
+title: "Practice 2.3 again"
+author: "Annie"
+date: "2024-10-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library (tidyr)
+library(dplyr)
+```
+
+
+```{r}
+
+rairuhuo<-
+read.table('https://www.dipintothereef.com/uploads/3/7/3/5/37359245/rairuoho.txt', header=T, sep='\t') 
+
+rairuhuo
+
+
+rairuhuo$treatment<-ifelse(rairuhuo$treatment=='nutrient', 'enrichment','water')
+rairuhuo
+
+rairuhuo_long <- rairuhuo %>%
+  pivot_longer(day3:day8, names_to = "day", values_to = "length")
+rairuhuo_long
+
+rairuhuo_merge <- rairuhuo_long %>%
+  unite("Plot", spatial1, spatial2, sep="_")
+rairuhuo_merge
+
+rairuhuo_merge$row<-NULL
+rairuhuo_merge$column<-NULL
+rairuhuo_merge
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```
+
