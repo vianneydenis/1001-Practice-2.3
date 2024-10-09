@@ -1,0 +1,99 @@
+---
+title: "Practice 3.2"
+author: "Annie"
+date: "2024-10-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r cars}
+summary(cars)
+```
+
+
+
+⚠ Practice 3.2 Create the following data frame from scratch. In this short and not very scientific experiment, the growth conditions of five plant individuals are to be tested. 
+
+The height of the plants will be measured at the beginning of the experiment and after one week. The height is a double; the time of the measurement (start_experiment and end_experiment) and the individual plants (plant 1, plant 2,plant 3,plant 4 and plant 5) are character vectors. 
+
+```{r}
+plants <- c("plant 1", "plant 2","plant 3","plant 4","plant 5")
+start_experiment <- c(4, 5, 3, 6, 7)
+end_experiment <- c(9, 6, 5, 4, 7) 
+df <- data.frame(plants, start_experiment, end_experiment)
+df
+```
+Reformat this data frame to obtain the height into one single column and the time of the measurement as a factor with two levels. You save this data frame as the first element of a list named my.experiment.
+做list中的第一個element,名為my.experiment
+1. wide轉成long
+2. 將start_experiment和end_experiment由character改成factor
+3. 把這個data frame存成my.experiment的第一個element
+```{r}
+library(tidyr)
+
+df_long <- df %>%
+  pivot_longer(cols = c(start_experiment, end_experiment),
+               names_to = "time",
+               values_to = "height")
+
+
+class(time)
+mode(time)#測試time是什麼樣的character#阿為什麼是function
+a <- c("start_experiment", "end_experiment")
+typeof(a) # OMG變成 character了！！！
+fact.time <- as.factor(a)
+class(fact.time)# class factor
+fact.time #查看 character values
+attributes(fact.time) #有兩個 attributes: levels and class
+levels(fact.time) #extract levels of a factor and the order
+
+element1 <- list(df_long) #把這個data frame存成一個叫my.experiment的list
+element1
+
+class(element1[[1]]) #
+str(element1)
+
+```
+
+The second element of this list will be another list called growth, in which three elements are stored: 
+[1] a character vector extracting the row names of the previously created table ; 
+[2] a numeric vector (double) indicating the change in height of each plant (can be positive or negative, but will be calculated as a percentage of the initial height); 
+[3] a combination of these two elements in a table with two columns: plants and growth.
+
+做list中的第二個element，which is名為growth的list
+```{r}
+#[1][2]
+plants.name <- df$plants
+initial.height<-element1$end_experiment
+final.height<-element1$start_experiment
+p<-c(end_experiment-start_experiment)/(start_experiment)*100
+p
+#[3] 
+growth.table <- data.frame(
+  plants = plants.name,
+  growth = p
+)
+
+growth <- list(plants.name, p, growth.table)
+growth
+
+my.experiment<- list(element1, growth)
+
+str(my.experiment) #查看each component’s structure
+
+```
+
+The third element of the my.experiment list will be an arbitrary message about the growth status of these plants
+```{r}
+message<-c("The growth status varies significantly among the plants, with some experiencing positive growth and others negative.")
+
+my.experiment<- list(element1, growth, message)
+my.experiment
+
+str(my.experiment)
+```
+
