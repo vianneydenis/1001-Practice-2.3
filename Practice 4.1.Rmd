@@ -39,18 +39,17 @@ plot(iris$Petal.Length, iris$Petal.Width,
      xlab = "Petal length (cm)", 
      ylab = "Petal width (cm)",
      main = "Petal width vs. length",
-     cex.main = 1.5,  
-     sub = "A refined scatter plot using base R graphics",
-     cex.sub=1.2,
-     pch = c(1, 2, 3)[as.numeric(iris$Species)],  
-     col = c("black", "red", "green")[as.numeric(iris$Species)])  # Different colors for species
+     cex.main = 1.5,  #字體大小
+     pch = c(1, 2, 3)[as.numeric(iris$Species)], ## 點形狀根據物種改變 
+     col = c("black", "red", "green")[as.numeric(iris$Species)])  
 
 # 斜線
-model <- lm(Petal.Width ~ Petal.Length, data = iris)
-abline(model, col = "black", lwd = 2)
+model <- lm(Petal.Width ~ Petal.Length, data = iris) #lm()函數建立一個線性回歸模型，來預測Petal.Width（花瓣寬度），根據自變量 Petal.Length（花瓣長度）。
+abline(model, col = "black", lwd = 2)#在現有的圖形上加一條線
+
 
 #  legend
-legend("topleft", legend = levels(iris$Species),
+legend("topleft", legend = levels(iris$Species),# 圖例標籤來自 Species 層級
        pch = c(1, 2, 3), 
        col = c("black", "red", "green"),
        )
