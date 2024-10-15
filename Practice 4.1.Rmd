@@ -1,0 +1,69 @@
+---
+title: "Practice 4.1"
+author: "Annie"
+date: "2024-10-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+```{r}
+pdf(file = "Practice 4.1.pdf", paper = "A4")
+
+
+data(iris)
+
+
+plot(iris$Petal.Length, iris$Petal.Width,
+     xlab = "Petal length (cm)", 
+     ylab = "Petal width (cm)",
+     main = "Petal width vs. length",
+     cex.main = 1.5,  
+     sub = "A refined scatter plot using base R graphics",
+     cex.sub=1.2,
+     pch = c(1, 2, 3)[as.numeric(iris$Species)],  
+     col = c("black", "red", "green")[as.numeric(iris$Species)])  # Different colors for species
+
+# 斜線
+model <- lm(Petal.Width ~ Petal.Length, data = iris)
+abline(model, col = "black", lwd = 2)
+
+#  legend
+legend("topleft", legend = levels(iris$Species),
+       pch = c(1, 2, 3), 
+       col = c("black", "red", "green"),
+       )
+
+# correlation coefficient
+r_value <- summary(model)$r.squared
+text(5.5, 0.5, labels = paste("R = ", round(sqrt(r_value), 2)), pos = 4)
+
+
+
+dev.off()
+
+```
+
+
+
