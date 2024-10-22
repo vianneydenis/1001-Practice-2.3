@@ -1,0 +1,58 @@
+---
+title: "Practice 4.1"
+author: "Annie"
+date: "2024-10-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+用Practice 2.3
+```{r}
+library (tidyr)
+library(dplyr)
+```
+
+
+```{r}
+
+rairuhuo<-
+read.table('https://www.dipintothereef.com/uploads/3/7/3/5/37359245/rairuoho.txt', header=T, sep='\t') 
+
+rairuhuo
+
+rairuhuo_long <- rairuhuo %>%
+  pivot_longer(day3:day8, names_to = "day", values_to = "length")
+rairuhuo_long
+
+rairuhuo_merge <- rairuhuo_long %>%
+  unite("Plot", spatial1, spatial2, sep="_")
+rairuhuo_merge
+
+rairuhuo_merge$row<-NULL
+rairuhuo_merge$column<-NULL
+rairuhuo_merge
+```
+`
+Using the rairuoho dataset you will use a ggplot2 visualization to show that over the course of the experiment 
+
+the growth of the grass is becoming higher in the nutrient treatment than in the water treatment. 
+
+You are free to use the visualization that you think makes the most sense 
+Do not forget to embellish your visualization and the use of a legend and/or theme. 
+The winner is the one who create the most informative and appealing plots. The price is that I will round up final score ;) You will send me a pdf file of the plot your made #改顏色
+#加數值
+
+
+```{r}
+library(tidyverse)
+potato <- ggplot(data=rairuhuo_merge,aes(x=day,y=length, fill=treatment))+geom_boxplot()+labs(title="Grass Growth:   Nutrient vs Water")+ scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9"))
+
+potato 
+
+
+
+```
+
