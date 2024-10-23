@@ -1,0 +1,129 @@
+---
+title: "Practice 4.1"
+author: "Annie"
+date: "2024-10-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+用Practice 2.3
+```{r}
+library (tidyr)
+library(dplyr)
+```
+
+
+```{r}
+
+rairuhuo<-
+read.table('https://www.dipintothereef.com/uploads/3/7/3/5/37359245/rairuoho.txt', header=T, sep='\t') 
+
+rairuhuo
+
+rairuhuo_long <- rairuhuo %>%
+  pivot_longer(day3:day8, names_to = "day", values_to = "length")
+rairuhuo_long
+
+rairuhuo_merge <- rairuhuo_long %>%
+  unite("Plot", spatial1, spatial2, sep="_")
+rairuhuo_merge
+
+rairuhuo_merge$row<-NULL
+rairuhuo_merge$column<-NULL
+rairuhuo_merge
+```
+`
+Using the rairuoho dataset you will use a ggplot2 visualization to show that over the course of the experiment 
+
+the growth of the grass is becoming higher in the nutrient treatment than in the water treatment. 
+
+You are free to use the visualization that you think makes the most sense 
+Do not forget to embellish your visualization and the use of a legend and/or theme. 
+The winner is the one who create the most informative and appealing plots. The price is that I will round up final score ;) You will send me a pdf file of the plot your made
+
+
+```{r}
+library(tidyverse)
+library(dplyr)
+
+chips <- rairuhuo_merge %>%
+  group_by(day, treatment) %>%
+  summarise(mean_length = mean(length, na.rm = TRUE), .groups = 'drop')
+
+potato<- ggplot(data=rairuhuo_merge,aes(x=day,y=length, fill=treatment))+
+  geom_boxplot(outlier.shape = NA, color = "#800000", show.legend =TRUE)+
+  labs(title="Grass Growth:   Nutrient vs Water",subtitle = "2024.10.23",
+    caption = "Source: Fun with R dataset")+ 
+  scale_fill_manual(values=c("#FF1493", "#FF00FF", "#FF00FF"))+ 
+  theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16))+
+  stat_summary(fun.y = mean, color = "#FFFF00", position = position_dodge(0.75),
+             geom = "point", shape = 18, size = 2,
+             show.legend = FALSE)+
+ geom_text(data = chips, aes(x = day, y = mean_length + 0.1, label = round(mean_length, 2)), 
+            vjust = -5, color = "#000080", position = position_dodge(1.0))+
+ theme(plot.background = element_rect(fill = "#FF0000"))+ 
+  theme(
+  panel.background = element_rect(fill = "#FFFF00",
+                                colour = "#FFFF00",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "#00FF00"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "#00FF00")
+  )
+  
+potato
+
+ggsave(potato,filename = "Practice 4.2 ugly.pdf")
+```
+原版 不敢亂動
+```{r}
+library(tidyverse)
+library(dplyr)
+
+
+
+potato<- ggplot(data=rairuhuo_merge,aes(x=day,y=length, fill=treatment))+
+  geom_boxplot(outlier.shape = NA, color = "#e74c3c", show.legend =FALSE)+
+  labs(title="Grass Growth:   Nutrient vs Water",subtitle = "YUMMMM",
+    caption = "Source: Fun with R dataset")+ 
+  scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9"))+ 
+  theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16))+
+  stat_summary(fun.y = mean, color = "darkred", position = position_dodge(0.75),
+             geom = "point", shape = 18, size = 3,
+             show.legend = FALSE)
+  
+potato
+
+
+```
+
+```{r}
+library(tidyverse)
+library(dplyr)
+
+# 計算每個 day 和 treatment 的平均值
+chips <- rairuhuo_merge %>%
+  group_by(day, treatment) %>%
+  summarise(mean_length = mean(length, na.rm = TRUE), .groups = 'drop')  # .groups = 'drop' 用於避免保持分組
+
+# 繪製箱型圖
+potato <- ggplot(data = rairuhuo_merge, aes(x = day, y = length, fill = treatment)) +
+  geom_boxplot(outlier.shape = NA, color = "#e74c3c", show.legend = FALSE) +
+  labs(title = "Grass Growth: Nutrient vs Water", subtitle = "YUMMMM",
+       caption = "Source: Fun with R dataset") +
+  scale_fill_manual(values = c("#999999", "#E69F00", "#56B4E9")) +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16)) +
+  stat_summary(fun = mean, color = "darkred", position = position_dodge(0.75),
+               geom = "point", shape = 18, size = 3, show.legend = FALSE) +
+  geom_text(data = chips, aes(x = day, y = mean_length + 0.1, label = round(mean_length, 2)), 
+            vjust = -5, color = "darkred", position = position_dodge(0.75))
+
+# 顯示圖表
+potato
+
+```
+
