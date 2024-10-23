@@ -42,17 +42,43 @@ the growth of the grass is becoming higher in the nutrient treatment than in the
 
 You are free to use the visualization that you think makes the most sense 
 Do not forget to embellish your visualization and the use of a legend and/or theme. 
-The winner is the one who create the most informative and appealing plots. The price is that I will round up final score ;) You will send me a pdf file of the plot your made #改顏色
-#加數值
+The winner is the one who create the most informative and appealing plots. The price is that I will round up final score ;) You will send me a pdf file of the plot your made
 
 
 ```{r}
 library(tidyverse)
-potato <- ggplot(data=rairuhuo_merge,aes(x=day,y=length, fill=treatment))+geom_boxplot()+labs(title="Grass Growth:   Nutrient vs Water")+ scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9"))
+library(dplyr)
 
-potato 
+chips <- rairuhuo_merge %>%
+  group_by(day, treatment) %>%
+  summarise(mean_length = mean(length, na.rm = TRUE), .groups = 'drop')
 
+potato<- ggplot(data=rairuhuo_merge,aes(x=day,y=length, fill=treatment))+
+  geom_boxplot(outlier.shape = NA, color = "#696969", show.legend =TRUE)+
+  labs(title="Grass Growth:   Nutrient vs Water",subtitle = "2024.10.23",
+    caption = "Source: Fun with R dataset")+ 
+  scale_fill_manual(values=c("#FF9933", "#56B4E9", "#56B4E9"))+ 
+  theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16))+
+  stat_summary(fun.y = mean, color = "#000000", position = position_dodge(0.75),
+             geom = "point", shape = 18, size = 2,
+             show.legend = FALSE)+
+ geom_text(data = chips, aes(x = day, y = mean_length + 0.1, label = round(mean_length, 2)), 
+            vjust = -5, color = "#404040", position = position_dodge(1.0))+
+ theme(plot.background = element_rect(fill = "#F5F5DC"))+ 
+  theme(
+  panel.background = element_rect(fill = "#BAF7E9",
+                                colour = "#BAF7E9",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )
+  
+potato
 
-
+ggsave(potato,filename = "Practice 4.2.pdf")
 ```
+
+
 
