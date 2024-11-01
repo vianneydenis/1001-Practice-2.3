@@ -1,0 +1,132 @@
+---
+title: "Practice 5.1 plz work"
+author: "Annie"
+date: "2024-11-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+
+library(rgbif)
+
+```
+
+⚠ Practice 5.1 Using the rgbif package download data from any species you like. 
+Make a nice map of the distribution of the selected species. 
+Of course you will fix projection problem when plotting you map. 
+You map can be static or interactive.
+```{r}
+
+
+library(rgbif)
+library(ggplot2)
+library(leaflet)
+library(maps)
+
+```
+#occ_search 是用於搜索物種出現記錄的函數
+#hasCoordinate=T 表示只選擇具有坐標訊息的記錄
+#limit=1000 限制下載的記錄數量為 1000 條
+```{r}
+species_name <- "Setonix brachyurus"  
+occ_data <- occ_search(scientificName = species_name, limit = 1000, hasCoordinate = TRUE)
+occ_df <- occ_data$data
+
+```
+
+Check CRS1
+```{r}
+print(occ_df)
+```
+Basic static map
+#geom_polygon() 用於創建填充的多邊形，表示世界地圖
+#group = group：告訴 ggplot2 如何將數據分組以形成多邊形的邊界。在這裡，group 是資料框中的一個變量，用於識別哪些點應該被視為同一個多邊形的部分。這意味著如果有多個多邊形（例如，國家或省的形狀），group 會確保這些點被正確地連接在一起以形成各自的形狀。
+#alpha:透明度
+```{r}
+
+world <- map_data("world") #載入世界地圖數據
+ggplot() +
+  geom_polygon(data = world, aes(x = long, y = lat, group = group), fill = "lightgray") +#世界地圖
+  geom_point(data = occ_df, aes(x = decimalLongitude, y = decimalLatitude), color = "blue", alpha = 0.6) +#加物種點點
+  coord_fixed() +#確保 x 軸的每個單位等於 y 軸的每個單位，維持地圖的正確比例
+  labs(title = paste("Distribution of", species_name)) +
+  theme_minimal()
+
+```
+
+#~decimalLongitude 和 ~decimalLatitude : 指定經度和緯度的映射
+#fillOpacity = 0.6 : 標記的填充透明度為0.6
+```{r}
+leaflet(occ_df) %>%
+  addTiles() %>% #加入世界地圖
+  addCircleMarkers(~decimalLongitude, ~decimalLatitude, radius = 3, color = "blue", stroke = FALSE, fillOpacity = 0.6) %>%
+  addLegend("topright", colors = "blue", labels = species_name, title = "Species Distribution")
+
+```
+Quokkaaaaa ahhhhh好煩一直按到放大縮小
+```{r}
+library(ggplot2)
+library(ggimage)
+library(jpeg)
+library(grid)
+
+
+potato_path <- "C:/Users/User/Desktop/碩一上/RRRRR/0924-in-class-practice/quok.jpg"
+chips <- readJPEG(potato_path)
+
+
+ggplot() +
+  geom_polygon(data = world, aes(x = long, y = lat, group = group), fill = "lightgray") +  # wrld map
+  geom_point(data = occ_df, aes(x = decimalLongitude, y = decimalLatitude), color = "blue", alpha = 0.6) +  
+  coord_fixed() +  ##確保 x 軸的每個單位等於 y 軸的每個單位，維持地圖的正確比例
+  labs(title = paste("Distribution of", species_name)) +
+  theme_minimal() +
+  # Quokka pic
+  annotation_custom(rasterGrob(chips), 
+                    xmin = max(occ_df$decimalLongitude) + 1,  
+                    xmax = max(occ_df$decimalLongitude) + 65,  
+                    ymin = max(occ_df$decimalLatitude) - 15,  
+                    ymax = max(occ_df$decimalLatitude) + 25)  
+
+```
+```{r}
+
+library(ggplot2)
+library(ggimage)
+library(jpeg)
+library(grid)
+library(maps)
+
+
+world <- map_data("world")
+
+hotdog <- subset(world, region == "Australia")
+
+
+potato_path <- "C:/Users/User/Desktop/碩一上/RRRRR/0924-in-class-practice/quok.jpg"
+chips <- readJPEG(potato_path)
+
+ggplot() +
+  geom_polygon(data = hotdog, aes(x = long, y = lat, group = group), fill = "#C1CDC1") +  # Australia map
+  geom_point(data = occ_df, aes(x = decimalLongitude, y = decimalLatitude), color = "#104E8B", alpha = 0.6) +  # Species points
+  coord_fixed(xlim = c(110, 160), ylim = c(-45, -10)) +  # Focus on Australia
+  labs(title = paste("Distribution of", species_name),
+       x = "Longitude",  
+       y = "Latitude") +
+  theme_minimal() +
+  annotation_custom(rasterGrob(chips), 
+                    xmin = 150,  
+                    xmax = 160,  # longtitude position 
+                    ymin = -10,  
+                    ymax = -20)  # latitude position
+
+
+ggsave(filename = "Cocoa.pdf")
+
+```
+
