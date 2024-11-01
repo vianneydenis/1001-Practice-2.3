@@ -1,0 +1,55 @@
+---
+title: "Untitled"
+author: "Annie"
+date: "2024-10-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+install.packages("sf")
+library(leaflet)
+#library(terra)
+library (rgbif)
+library(maps)
+library(sf)
+```
+
+
+```{r}
+# Download occurrence data
+
+quokka_data <- occ_search(scientificName = "Setonix brachyurus", hasCoordinate = TRUE, limit = 1000)
+
+#occ_search 是用於搜索物種出現記錄的函數
+#hasCoordinate=T 表示只選擇具有坐標訊息的記錄
+#limit=1000 限制下載的記錄數量為 1000 條
+
+quokka_data <- quokka_data$data
+
+```
+
+Prepare Data for Mapping
+```{r}
+# Create an sf object
+quokka_sf <- st_as_sf(quokka_data, coords = c("decimalLongitude", "decimalLatitude"), crs = 4326)
+
+head(quokka_sf)
+
+```
+
+Create Interactive Map
+```{r}
+# Create the interactive map
+leaflet(quokka_sf) %>%
+  addTiles() %>%
+  setView(lng = mean(quokka_sf$decimalLongitude, na.rm = TRUE), lat = mean(quokka_sf$decimalLatitude, na.rm = TRUE), zoom = 5) %>%
+  addCircleMarkers(radius = 4, color = "blue", fillOpacity = 0.5, stroke = FALSE,
+                   popup = paste("Longitude:", quokka_sf$decimalLongitude, "<br>",
+                                 "Latitude:", quokka_sf$decimalLatitude))
+
+```
+
