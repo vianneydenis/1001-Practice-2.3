@@ -1,0 +1,86 @@
+---
+title: "Practice 6.3"
+author: "Annie"
+date: "2024-11-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+⚠ Practice 6.2 
+When having two species using the same resources but with different rates of efficiency), we can model their population growth using two linked equations:
+N1t+1=N1t+[growth.rate∗N1t∗(K1−N1t−α12N2tK1)]
+N2t+1=N2t+[growth.rate∗N2t∗(K2−N2t−α21N1tK2)]
+
+Those equations are known as the Lotka-Volterra equations where K values are the carrying capacities for each of the two species, both α values are competition coefficients that translate the effect of one species on another. 
+
+Do not worry about this for now, try a range of 0.5 to 1.5, which would indicate that species are fairly similar competitors. I wrote the script, approaching the solution but damn… still not working! Help me to fix the following codes - this time you can look at it! See if you can debug this code that should grow each species alone (no competition), then put the two species interacting. Compare the results of 3 different plot. Note It would be easier if you first focus your attention on the functions of two species competing. Make an animation that makes sense will further be amazing
+```{r}
+library(ggplot2)
+library(gganimate)
+library(dplyr)
+library(tidyr)
+
+num_gen <- 30             
+growth_rate <- 1.2       
+K1 <- 100               
+K2 <- 120                 
+a12 <- 0.8               
+a21 <- 0.8                
+
+grow <- function(start_N1, start_N2, comp = TRUE) { #如果 comp = TRUE 就加入物種之間的競爭效果，不然兩個物種獨立成長
+  N1 <- numeric(num_gen)
+  N2 <- numeric(num_gen)
+  N1[1] <- start_N1
+  N2[1] <- start_N2
+  
+  
+  for (i in 2:num_gen) {
+    if (comp) {
+      # 競爭
+      N1[i] <- N1[i-1] + growth_rate * N1[i-1] * (K1 - N1[i-1] - a12 * N2[i-1]) / K1
+      N2[i] <- N2[i-1] + growth_rate * N2[i-1] * (K2 - N2[i-1] - a21 * N1[i-1]) / K2
+    } else {
+      # 無競爭（每個物種獨立成長）
+      N1[i] <- N1[i-1] + growth_rate * N1[i-1] * (K1 - N1[i-1]) / K1
+      N2[i] <- N2[i-1] + growth_rate * N2[i-1] * (K2 - N2[i-1]) / K2
+    }
+    
+    N1[i] <- max(N1[i], 0) 
+    N2[i] <- max(N2[i], 0)
+  }#如果 N1[i] 是負數，這行會將 N1[i] 設為 0；如果 N1[i] 是正數或 0，則保持原值不變。確保種群數量不會變成負值，讓種群數量至少為零
+  
+  
+  data.frame(generation = 1:num_gen, N1 = N1, N2 = N2) 
+}# 產生一個數列 1 到 num_gen，表示從第一代到第 num_gen 代
+  #將之前計算得到的 N1（物種1的族群數量隨世代變化的向量）作為 N1 欄
+
+
+data_species1 <- grow(start_N1 = 1, start_N2 = 0, comp = FALSE)#comp = FALSE:沒有競爭，只有物種1的族群數量增長。
+data_species2 <- grow(start_N1 = 0, start_N2 = 1, comp = FALSE)
+data_competition <- grow(start_N1 = 1, start_N2 = 1, comp = TRUE)
+
+par(mar=c(4,4,1,2), mfrow=c(3,1), las=1) 
+
+
+
+plot(data_species1$generation, data_species1$N1, type = "b", col = "black",xlim=c(0,30),
+     ylim = c(0, 120), ylab = "N", xlab = "generation")
+
+text(2.5, 100, "Species 1 alone", col = "black", cex = 0.9)
+
+
+plot(data_species2$generation, data_species2$N2, type = "b", col = "red",
+     ylim = c(0, 120), ylab = "N", xlab = "generation")
+text(2.5, 100, "Species 2 alone", col = "black", cex = 0.9)
+
+
+plot(data_competition$generation, data_competition$N1, type = "b", col = "black",
+     ylim = c(0, 120), ylab = "N", xlab = "generation")
+lines(data_competition$generation, data_competition$N2, type = "b", col = "red")
+text(4, 100, "Both Species competing", col = "black", cex = 0.9)
+```
+
+
+
