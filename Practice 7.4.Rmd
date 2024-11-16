@@ -1,0 +1,80 @@
+---
+title: "Practice 7.4"
+author: "Annie"
+date: "2024-11-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rairuoho<-read.table('https://www.dipintothereef.com/uploads/3/7/3/5/37359245/rairuoho.txt', header=T, sep='\t') 
+
+```
+
+Practice 7.4 Create your own pearson.test function
+(e.g. you will not use the above cor.test function but you will code your own function). 
+The function should (at least) be able to test for the correlation between two variables. 
+You will need to check at ?pt (or similar function) in order to extract the p-value. 
+You can “dissect” the code source of the current cor.test function using getAnywhere("cor.test.default"). 
+Using the rairuoho dataset, please use your customized function to test correlation between length at day 3 & day 4 then day 3 & day 8 in each treatment (nutrient and water). 
+Interpret results
+
+?pt 是用來查詢 pt 函數的說明文件。pt 是一個內建函數，用於計算 t 分佈的累積分佈函數 (CDF, cumulative distribution function)。pt 是 t 分佈的累積分佈函數，常用於計算：
+單尾或雙尾的 p 值。
+給定 t 值及自由度時，對應的累積概率。
+
+```{r}
+
+library(ggplot2)
+
+
+pearson.test <- function(x, y) {
+  n <- length(x) # 樣本數
+  if (n != length(y)) {
+    stop("The lengths of the two variables must match.")
+  }
+  r <- cor(x, y, method = "pearson")
+  t_value <- r * sqrt((n - 2) / (1 - r^2)) 
+  p_value <- 2 * pt(-abs(t_value), df = n - 2) 
+  return(list(correlation = r, t_value = t_value, p_value = p_value))
+}
+
+nutrient <- subset(rairuoho, treatment == "nutrient")
+water <- subset(rairuoho, treatment == "water")
+
+
+nutrient34 <- pearson.test(nutrient$day3, nutrient$day4)
+nutrient38 <- pearson.test(nutrient$day3, nutrient$day8)
+
+
+water34 <- pearson.test(water$day3, water$day4)
+water38 <- pearson.test(water$day3, water$day8)
+
+
+nutrient34
+nutrient38
+water34
+water38
+
+
+# Nutrient Day 3 vs Day 4
+ggplot(nutrient, aes(x = day3, y = day4)) +
+  geom_point(color = "blue") +
+  geom_smooth(method = "lm", color = "red") +
+  labs(title = "Nutrient: Day 3 vs Day 4", x = "Day 3 Length", y = "Day 4 Length")
+
+# Water Day 3 vs Day 8
+ggplot(water, aes(x = day3, y = day8)) +
+  geom_point(color = "green") +
+  geom_smooth(method = "lm", color = "red") +
+  labs(title = "Water: Day 3 vs Day 8", x = "Day 3 Length", y = "Day 8 Length")
+
+getAnywhere("cor.test.default") 
+#查看cor.test背後的程式碼#函數是如何處理輸入數據的（例如是否有 NA 值、是否是數字型資料）。
+#背後的公式和計算方法，像是相關係數公式、t 值的計算。
+#它如何處理不同的相關性檢定方法（例如 Pearson, Spearman, Kendall）。
+#如何產生 p 值和檢定結果。
+
+
+
+```
